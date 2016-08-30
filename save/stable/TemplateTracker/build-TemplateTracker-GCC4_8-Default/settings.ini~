@@ -1,0 +1,5 @@
+Template=template.pcd
+Landmarks=landmarks.txt
+FERData=/home/radu/work/cpp/FaceCept3D/data/FERData
+DetectorData=/home/radu/work/cpp/FaceCept3D/data/DetectorData
+DistanceToShow=1.2
