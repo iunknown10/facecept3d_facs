@@ -20,7 +20,9 @@ typedef pcl::PointXYZRGBA PointType;
 
 int main(int argc, char *argv[])
 {
-    HPESettings settings;
+    std::string path = argv[1];
+    std::cout << path << std::endl;
+    HPESettings settings(path);
 
     try
     {

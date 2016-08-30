@@ -53,6 +53,8 @@ namespace hpe
         }
 
         CloudXYZRGBA::Ptr cloudObject(new CloudXYZRGBA);
+        //cv::imshow("rgb", rawFrames->colorFrame); cvWaitKey(2);
+        //cv::imshow("depth", rawFrames->depthFrame); cvWaitKey(2);
         cloudObject->cloud = m_converter->DepthRGBToPointCloud(rawFrames->depthFrame, rawFrames->colorFrame);
 
         dataStorage->Set(m_cloudKey, cloudObject);

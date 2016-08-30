@@ -42,6 +42,17 @@ namespace hpe
                 Common<pcl::PointXYZRGBA>::Landmarks landmarks;
                 PointPicker<pcl::PointXYZRGBA> picker;
                 picker.SetCloud(cloudObject->cloud);
+
+//                pcl::visualization::PCLVisualizer localVis("CheckCloud", true);
+//                localVis.addPointCloud<pcl::PointXYZRGBA>(cloudObject->m_cloud, "c");
+//                localVis.addCoordinateSystem(1.0);
+
+//                while (! localVis.wasStopped())
+//                {
+//                    localVis.spinOnce(100);
+//                    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+//                }
+
                 landmarks = picker.Pick("Selecte face boundaries", 4, "Select the four face boundaries in the following order:\n"
                                         "\t1. Leftmost point\n."
                                         "\t2. Rightmost point\n."

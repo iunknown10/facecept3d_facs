@@ -18,6 +18,7 @@
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/search/kdtree.h>
+#include <pcl/common/transforms.h>
 
 namespace hpe
 {
@@ -44,7 +45,7 @@ namespace hpe
         while (std::getline(istream, line))
         {
             std::vector<std::string> values;
-            boost::split(values, line, boost::is_any_of(" \t"), boost::token_compress_on);
+            boost::split(values, line, boost::is_any_of(" \r"), boost::token_compress_on);
             typename Common<PointType>::Landmark l;
             if (values[0] != "n")
             {

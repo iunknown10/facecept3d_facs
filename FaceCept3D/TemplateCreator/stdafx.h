@@ -14,22 +14,23 @@
 #include <pcl/search/kdtree.h>
 #include <pcl/common/time.h>
 
-#include <Settings/HPESettings.h>
+#include "Settings/HPESettings.h"
+//#include <Settings/HPESettings.h>
 
 #ifndef __linux__
 	#include <objbase.h>
     #include <WindowsOnly/Grabber/KinectSDKGrabber.h>
     #include <WindowsOnly/Processor/KinectSDKConverterProcessor.h>
 #else
-	#include <Grabber/OpenNIGrabber.h>
+    #include "Grabber/OpenNIGrabber.h"
 #endif
 
 
-#include <Processor/ConverterProcessor.h>
-#include <Processor/DepthPreprocessingProcessor.h>
-#include <Processor/HeadExtractionProcessor.h>
-#include <Processor/TemplateCreatorProcessor.h>
-#include <Processor/ShowCloudProcessor.h>
+#include "Processor/ConverterProcessor.h"
+#include "Processor/DepthPreprocessingProcessor.h"
+#include "Processor/HeadExtractionProcessor.h"
+#include "Processor/TemplateCreatorProcessor.h"
+#include "Processor/ShowCloudProcessor.h"
 
-#include <Converter/KinectDataConverter.h>
+#include "Converter/KinectDataConverter.h"
 

@@ -19,17 +19,18 @@
 #include <Processor/ConverterProcessor.h>
 #include <Processor/DetectorProcessor.h>
 #include <Processor/FilterProcessor.h>
+#include "Converter/KinectDataConverter.h"
 
 #include <boost/bind.hpp>
 
 
 using namespace hpe;
 
-int main(int argc, char *argv[])
+int main()
 {
     HPESettings settings;
 
-    KinectSDKGrabber grabber;
+    OpenNIGrabber grabber;
 
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr templateCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
     pcl::io::loadPCDFile(settings.GetString("Template"), *templateCloud);
@@ -40,16 +41,18 @@ int main(int argc, char *argv[])
     std::shared_ptr<DepthPreprocessingProcessor> preprocessor(new DepthPreprocessingProcessor(1, 3, 13, 7, 1.2));
 
     std::shared_ptr<hpe::TrackingProcessor> templateTracker(new hpe::TrackingProcessor(templateCloud));
-    templateTracker->SetTemplateLandmarks(LoadLandmarks<pcl::PointXYZRGBA>(settings.GetString("Landmarks")));
+    Common<pcl::PointXYZRGBA>::Landmarks landmarks = LoadLandmarks<pcl::PointXYZRGBA>(settings.GetString("Landmarks"));
+    templateTracker->SetTemplateLandmarks(landmarks);
     templateTracker->SetSaveLandmakrs(false);
     
 
     std::string cloudToShowKey = "FilteredOriginalCloud";
+//    std::string cloudToShowKey = "Cloud";
     std::shared_ptr<VisuilizeProcessor> visualizer(new VisuilizeProcessor(cloudToShowKey));
     visualizer->SetTrackingProcessor(templateTracker);
 
-    std::shared_ptr<hpe::FacialExpressionProcessor> ferProcessor(new hpe::FacialExpressionProcessor(settings.GetString("FERData")));
-    ferProcessor->SubscribeFacialExpressionReadySignal(boost::bind(&VisuilizeProcessor::HandleFER, visualizer.get(), _1));
+    //std::shared_ptr<hpe::FacialExpressionProcessor> ferProcessor(new hpe::FacialExpressionProcessor(settings.GetString("FERData")));
+    //ferProcessor->SubscribeFacialExpressionReadySignal(boost::bind(&VisuilizeProcessor::HandleFER, visualizer.get(), _1));
 
 
     std::shared_ptr<FunctorFilter<pcl::PointXYZRGBA>> functorFilter(new FunctorFilter<pcl::PointXYZRGBA>(
@@ -57,16 +60,24 @@ int main(int argc, char *argv[])
         return PassThrough<pcl::PointXYZRGBA>(cloud, 0., settings.GetValue<float>("DistanceToShow"), "z");
     }));
 
-    std::shared_ptr<FilterProcessor> filterProcessor(new FilterProcessor(functorFilter, "OriginalCloud", "FilteredOriginalCloud"));
+    std::shared_ptr<FilterProcessor> filterProcessor(new FilterProcessor(functorFilter, "Cloud", "FilteredOriginalCloud"));
 
-    grabber.AddProcessor(IProcessor::Ptr(new KinectSDKConverterProcessor("OriginalCloud")));
-    grabber.AddProcessor(filterProcessor);
-    grabber.AddProcessor(IProcessor::Ptr(new DetectorProcessor(settings.GetString("DetectorData"))));
+    std::shared_ptr<ConverterProcessor> converterProcessor(new hpe::ConverterProcessor());
+    //converterproc->SetCloudKey("OriginalCloud");
+    ConverterProcessor::ConverterPtr converter(new KinectDataConverter);
+    converterProcessor->SetConverter(converter);
+
+    //grabber.AddProcessor(IProcessor::Ptr(new ConverterProcessor(ConverterProcessor::ConverterPtr(new KinectDataConverter))));
+
+    //grabber.AddProcessor(uiProcessor);
     grabber.AddProcessor(preprocessor);
-    grabber.AddProcessor(IProcessor::Ptr(new KinectSDKConverterProcessor("Cloud")));
+
+    grabber.AddProcessor(converterProcessor);
+
+    grabber.AddProcessor(filterProcessor);
     grabber.AddProcessor(IProcessor::Ptr(new VoxelizeProcessor(0.005)));
     grabber.AddProcessor(templateTracker);
-    grabber.AddProcessor(ferProcessor);
+    //grabber.AddProcessor(ferProcessor);
     grabber.AddProcessor(visualizer);
 
     grabber.Start();

@@ -45,8 +45,8 @@ void UIProcessor::Process(hpe::IDataStorage::Ptr dataStorage)
     using namespace hpe;
     RawFrames::Ptr frames = dataStorage->GetAndCastNotNull<RawFrames>("RawFrames");
 
-    cv::imshow("color", frames->colorFrame);
-    cv::imshow("depth", frames->depthFrame);
+    //cv::imshow("color", frames->colorFrame);
+    //cv::imshow("depth", frames->depthFrame);
 
     int key = cv::waitKey(1);
     if (key != -1)

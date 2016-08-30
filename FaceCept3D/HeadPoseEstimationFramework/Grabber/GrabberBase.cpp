@@ -1,7 +1,7 @@
 #include "GrabberBase.h"
 
 #include <DataObject/RawFrames.h>
-#include <pcl/common/time.h>
+#include <pcl/io/pcd_io.h>
 
 namespace hpe
 {

@@ -72,7 +72,17 @@ namespace hpe
                 viewer.registerPointPickingCallback(&PointPicker::PointPickingCallback, this);
                 viewer.registerKeyboardCallback(&PointPicker::KeyboardCallback, this);
 
-                viewer.addPointCloud(m_cloud, "cloud");
+                viewer.addPointCloud<pcl::PointXYZRGBA>(m_cloud, "cloud");
+
+//                pcl::visualization::PCLVisualizer localVis("CheckCloud", true);
+//                localVis.addPointCloud<pcl::PointXYZRGBA>(m_cloud, "c");
+//                localVis.addCoordinateSystem(1.0);
+
+//                while (! viewer.wasStopped())
+//                {
+//                    viewer.spinOnce(100);
+//                    boost::this_thread::sleep(boost::posix_time::milliseconds(20));
+//                }
 
                 if (m_showColor == false)
                 {

@@ -35,6 +35,7 @@ namespace hpe
         cv::Mat frameRGB = cv::Mat(img->getHeight(), img->getWidth(), CV_8UC3);
 
         img->fillRGB(frameRGB.cols, frameRGB.rows, frameRGB.data, frameRGB.step);
+        //cv::imshow("RGB Frame", frameRGB); cv::waitKey(10);
         cv::Mat frameBGR;
         cv::cvtColor(frameRGB, frameBGR, cv::COLOR_RGB2BGR);
         return frameBGR;
@@ -44,6 +45,7 @@ namespace hpe
     {
         cv::Mat frameDepth = cv::Mat(depthImg->getHeight(), depthImg->getWidth(), CV_32FC1);
         depthImg->fillDepthImage(frameDepth.cols, frameDepth.rows, (float *)frameDepth.data, frameDepth.step);
+        //cv::imshow("Depth Frame", frameDepth); cv::waitKey(10);
         return frameDepth;
     }
 
@@ -56,6 +58,10 @@ namespace hpe
 
         colorMat.copyTo(m_colorFrame);
         depthMat.copyTo(m_depthFrame);
+
+        //cv::imshow("depth", depthMat);
+        //cv::imshow("video", colorMat);
+        //cv::waitKey(1);
 
         m_haveFrames = true;
     }

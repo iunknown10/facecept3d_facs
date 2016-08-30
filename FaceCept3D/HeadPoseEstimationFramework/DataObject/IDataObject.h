@@ -4,7 +4,7 @@
 #define IDATAOBJECT_H
 
 #include <Interface/IInterface.h>
-
+#include <iostream>
 #include <memory>
 
 namespace hpe

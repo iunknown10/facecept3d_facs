@@ -2,8 +2,6 @@
 #define CLOUDMAPPER_H
 
 #include <memory>
-
-
 #include <vector>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>

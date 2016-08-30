@@ -5,12 +5,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "csvMat.h"
+#include <fstream>
 
 using namespace cv;
 using namespace std;
 using std::vector;
-
-#include <fstream>
 
 namespace hpe
 {
@@ -18,7 +17,7 @@ namespace hpe
     Mat readCSVMat(string csvFrameName, int lin, int col)
     {
         Mat output(lin, col, CV_64FC1);
-        ifstream inFile(csvFrameName);
+        ifstream inFile(csvFrameName.c_str());
         string line;
         int linenum = 0;
         while (getline(inFile, line))

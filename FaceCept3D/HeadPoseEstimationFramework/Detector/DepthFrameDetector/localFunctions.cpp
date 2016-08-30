@@ -18,7 +18,7 @@ namespace hpe
 
     void loadConfig(std::string filename, paramList *p, bool verbose)
     {
-        ifstream in(filename);
+        ifstream in(filename.c_str());
         string dummy;
 
         if (in.is_open()) {
@@ -203,9 +203,17 @@ namespace hpe
                     }
                 }
 
-                int countTrues = count_if(inInds.begin(), inInds.end(), [](bool b) {
-                    return b == true;
-                });
+//                int countTrues = count_if(inInds.begin(), inInds.end(), [](bool b) {
+//                    return b == true;
+//                });
+                int countTrues = 0;
+                for (int i=0; i<numPts; i++)
+                {
+                    if (inInds[i] == true)
+                    {
+                        countTrues++;
+                    }
+                }
                 vector<double> myOldMean = myMean;
                 cv::Mat tempData(countTrues, numDim, CV_64FC1);
                 int localIdx = 0;
@@ -222,7 +230,7 @@ namespace hpe
                     }
                 }
                 Mat myMeanMat;
-				cv::reduce(tempData, myMeanMat, 0, CV_REDUCE_AVG);
+                cv::reduce(tempData, myMeanMat, 0, CV_REDUCE_AVG);
                 myMeanMat.copyTo(myMean);
 
                 // compute the 2-norm of the difference-between-means vector
@@ -309,7 +317,7 @@ namespace hpe
         //defines the test patch
         Rect roi = Rect(0, 0, p_width, p_height);
 
-        int min_no_pixels = p_width * p_height / 10;
+        //int min_no_pixels = p_width * p_height / 10;
 
         //vector<LeafNode*> leaves;
         LeafNode bufferLeaf;
@@ -444,6 +452,7 @@ namespace hpe
                 std::sort(distHeadCenterIdx.begin(), distHeadCenterIdx.end(), [&distHeadCenter](size_t i1, size_t i2) {
                     return distHeadCenter[i1] < distHeadCenter[i2];
                 });
+
                 vector<int> headCenterInd(offsetXVec.size());
                 headCenterInd.assign(offsetXVec.size(), 0);
                 if (offsetXVec.size() > p.minVotes)

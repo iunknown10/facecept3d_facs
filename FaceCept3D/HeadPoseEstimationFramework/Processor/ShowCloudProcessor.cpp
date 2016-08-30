@@ -2,6 +2,7 @@
 
 #include <DataObject/CloudXYZRGBA.h>
 #include <pcl/common/time.h>
+#include <pcl/io/pcd_io.h>
 
 namespace hpe
 {
@@ -24,6 +25,9 @@ namespace hpe
     {
         IDataObject::Ptr obj = storage->Get(m_key);
         CloudXYZRGBA::Ptr cloudObject = std::dynamic_pointer_cast<CloudXYZRGBA>(obj);
+        //CloudXYZRGBA::Ptr cloudObject(new CloudXYZRGBA(true));
+        //std::string path = "/home/radu/work/cpp/FaceCept3D/FaceCept3D/TemplateTracker/build-TemplateTracker-GCC4_8-Default/template.pcd";
+        //pcl::io::loadPCDFile(path, *(cloudObject->cloud));
         if (cloudObject.get() == nullptr)
         {
             return;
@@ -32,7 +36,9 @@ namespace hpe
         if (m_first)
         {
             m_visualizer.registerKeyboardCallback(&ShowCloudProcessor::KeyboardEventCallback, this);
-            m_visualizer.addPointCloud(cloudObject->cloud, m_key);
+            m_visualizer.addPointCloud<pcl::PointXYZRGBA>(cloudObject->cloud, m_key);
+            //m_visualizer.addCoordinateSystem(1.0);
+            //m_visualizer.initCameraParameters ();
             m_first = false;
         }
         else
@@ -41,6 +47,7 @@ namespace hpe
         }
 
         m_visualizer.spinOnce();
+        //boost::this_thread::sleep(boost::posix_time::seconds(1));
     }
 
     void ShowCloudProcessor::KeyboardEventCallback(const pcl::visualization::KeyboardEvent &event, void *sender)

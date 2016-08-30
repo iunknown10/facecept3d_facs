@@ -63,20 +63,38 @@ namespace hpe
             if (info.get() == nullptr)
             {
                 Common<PointType>::Landmarks frameLandmarks;
-                if (fileinfo.get() != nullptr)
+                /*if (fileinfo.get() != nullptr)
                 {
-                    std::string landmarksFile = boost::replace_all_copy(fileinfo->Filename, ".pcd", ".bnd");
+                    std::string landmarksFile = boost::algorithm::replace_all_copy(fileinfo->Filename, ".pcd", ".bnd");
                     if (boost::filesystem::exists(landmarksFile))
                     {
                         frameLandmarks = LoadLandmarks<pcl::PointXYZRGBA>(landmarksFile);
                     }
-                }
-                if (frameLandmarks.size() != 3)
+                }*/
+                std::string path = "/home/radu/Documents/FileInfo.pcd";
+                std::string landmarksFile = boost::algorithm::replace_all_copy(path, ".pcd", ".bnd");
+                if (boost::filesystem::exists(landmarksFile))
                 {
+                    frameLandmarks = LoadLandmarks<pcl::PointXYZRGBA>(landmarksFile);
+                }
+                else
+                {
+                    PCDGrabber::CloudFileInfo::Ptr fileinfo_1(new PCDGrabber::CloudFileInfo);
+
+                    fileinfo_1->Filename = path;
+                    //std::string path_out = fileinfo_1->Filename;
+                    storage->Set("FileInfo", fileinfo_1);
                     frameLandmarks = GetLandmarks(cloudObject->cloud);
-                    std::string landmarksFile = boost::replace_all_copy(fileinfo->Filename, ".pcd", ".bnd");
                     SaveLandmarks<pcl::PointXYZRGBA>(frameLandmarks, landmarksFile);
                 }
+                /*if (frameLandmarks.size() != 3)
+                {
+                    frameLandmarks = GetLandmarks(cloudObject->cloud);
+                    PCDGrabber::CloudFileInfo::Ptr fileinfo_1 = storage->GetAndCast<PCDGrabber::CloudFileInfo>("FileInfo");
+                    std::string f_out = fileinfo_1->Filename;
+                    std::string landmarksFile = boost::algorithm::replace_all_copy(f_out, ".pcd", ".bnd");
+                    SaveLandmarks<pcl::PointXYZRGBA>(frameLandmarks, landmarksFile);
+                }*/
                 Eigen::Matrix4f transform = m_mapper.GetTransformHavingLandmarks(m_template, m_templateLandmarks, cloudObject->cloud, frameLandmarks);
                 pcl::transformPointCloud(*m_template, *(updatedTemplateObject->cloud), transform);
                 m_tracker->RoughFirstTimeDetection(cloudObject->cloud, transform);
