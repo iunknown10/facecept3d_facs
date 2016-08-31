@@ -115,7 +115,10 @@ void VisuilizeProcessor::Process(hpe::IDataStorage::Ptr dataStorage)
         m_visualizer.removeShape("anglesText");
         m_visualizer.addText(anglesText, 25, 175, 17, 1, 1, 1, "anglesText");
         m_visualizer.setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, ((float)0x73) / 255, ((float)0x3C) / 255, "cylinder");
-        m_visualizer.updatePointCloud<pcl::PointXYZRGBA>(cloud->cloud, m_cloudKey);
+        m_visualizer.removePointCloud(m_cloudKey);
+        m_visualizer.addPointCloud<pcl::PointXYZRGBA>(cloud->cloud, m_cloudKey);
+        m_visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, m_cloudKey);
+//        m_visualizer.updatePointCloud<pcl::PointXYZRGBA>(cloud->cloud, m_cloudKey);
         m_visualizer.updatePointCloud(eyes, m_landmarksKey);
 
    //     if (m_haveFerData)3

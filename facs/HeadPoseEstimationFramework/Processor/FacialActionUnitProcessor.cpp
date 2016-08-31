@@ -26,7 +26,7 @@ namespace hpe
             CloudXYZRGBA::Ptr cloudObject = dataStorage->GetAndCast<CloudXYZRGBA>("OriginalCloud");
             if (cloudObject.get() == nullptr)
             {
-                cloudObject = dataStorage->GetAndCastNotNull<CloudXYZRGBA>("Cloud", "FacialActionUnitProcessor::Process - cloud is null");
+                cloudObject = dataStorage->GetAndCastNotNull<CloudXYZRGBA>("FilteredOriginalCloud", "FacialActionUnitProcessor::Process - cloud is null");
             }
             LandmarksObject<pcl::PointXYZRGBA>::Ptr landmarksObject = dataStorage->GetAndCastNotNull<LandmarksObject<pcl::PointXYZRGBA>>("Landmarks", "FacialActionUnitProcessor::Process - landmarks are null");
 

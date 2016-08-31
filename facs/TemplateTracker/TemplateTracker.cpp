@@ -38,7 +38,7 @@ int main()
     std::shared_ptr<UIProcessor> uiProcessor(new UIProcessor);
     uiProcessor->SetGrabber(&grabber);
 
-    std::shared_ptr<DepthPreprocessingProcessor> preprocessor(new DepthPreprocessingProcessor(1, 3, 13, 7, 1.2));
+    std::shared_ptr<DepthPreprocessingProcessor> preprocessor(new DepthPreprocessingProcessor(1, 3, 7, 3, 1.5)); // erodeSize, closingSize, gaussianSize, gaussianSigma, distanceTh
 
     //std::shared_ptr<DetectorProcessor> headposeDetector(new DetectorProcessor(settings.GetString("DetectorData")));
 
@@ -57,8 +57,8 @@ int main()
 //    std::shared_ptr<hpe::FacialExpressionProcessor> ferProcessor(new hpe::FacialExpressionProcessor(settings.GetString("FERData")));
 //    ferProcessor->SubscribeFacialExpressionReadySignal(boost::bind(&VisuilizeProcessor::HandleFER, visualizer.get(), _1));
 
-//    std::shared_ptr<hpe::FacialActionUnitProcessor> facsProcessor(new hpe::FacialActionUnitProcessor(settings.GetString("FACSData"), {1, 4, 6, 9, 12, 43}));
-//    facsProcessor->SubscribeFacialActionUnitReadySignal(boost::bind(&VisuilizeProcessor::HandleFACS, visualizer.get(), _1));
+    std::shared_ptr<hpe::FacialActionUnitProcessor> facsProcessor(new hpe::FacialActionUnitProcessor(settings.GetString("FACSData"), {1, 4, 6, 9, 12, 43}));
+    facsProcessor->SubscribeFacialActionUnitReadySignal(boost::bind(&VisuilizeProcessor::HandleFACS, visualizer.get(), _1));
 
     std::shared_ptr<FunctorFilter<pcl::PointXYZRGBA>> functorFilter(new FunctorFilter<pcl::PointXYZRGBA>(
     [&settings](pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud)->pcl::PointCloud<pcl::PointXYZRGBA>::Ptr  {
@@ -75,15 +75,18 @@ int main()
     //grabber.AddProcessor(IProcessor::Ptr(new ConverterProcessor(ConverterProcessor::ConverterPtr(new KinectDataConverter))));
 
     //grabber.AddProcessor(uiProcessor);
-    grabber.AddProcessor(preprocessor);
+    grabber.AddProcessor(preprocessor); // filters depth data
 
-    grabber.AddProcessor(converterProcessor);
+    grabber.AddProcessor(converterProcessor); // combines (filtered) depth and rgb into a point cloud representation saved in "Cloud"
 
-    grabber.AddProcessor(filterProcessor);
-    grabber.AddProcessor(IProcessor::Ptr(new VoxelizeProcessor(0.003)));
+    grabber.AddProcessor(filterProcessor); // filters the point cloud representation (in this case a parametrized (by "DistanceToShow") "PassThrough" filter is being used)
+    // and returns the result in "FilteredOriginalCloud"
+
+    grabber.AddProcessor(IProcessor::Ptr(new VoxelizeProcessor(0.02))); // applies yet another filter to the "Cloud" and returns the result in "Cloud"
     //grabber.AddProcessor(headposeDetector);
+
     grabber.AddProcessor(templateTracker);
-//    grabber.AddProcessor(ferProcessor);
+    grabber.AddProcessor(facsProcessor);
     grabber.AddProcessor(visualizer);
 
     grabber.Start();
