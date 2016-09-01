@@ -118,21 +118,21 @@ namespace hpe
                     std::sort(m_rows[i].begin(), m_rows[i].end());
                 }
 
-                if (m_visualize)
-                {
-                    pcl::visualization::PCLVisualizer v("Segments");
-                    v.addPointCloud<PointType>(cloud);
-                    v.addPointCloud<PointType>(cloud, "pts");
-                    v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "pts");
-                    for (int i = 0; i < m_phiSteps; i += 1)
-                    {
-                        typename Cloud::Ptr subcloud(new Cloud);
-                        pcl::copyPointCloud(*cloud, m_columns[i], *subcloud);
-                        v.updatePointCloud<PointType>(subcloud, "pts");
-                        v.spin();
-                    }
-                    v.removeAllPointClouds();
-                }
+//                if (m_visualize)
+//                {
+//                    pcl::visualization::PCLVisualizer v("Segments");
+//                    v.addPointCloud<PointType>(cloud);
+//                    v.addPointCloud<PointType>(cloud, "pts");
+//                    v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "pts");
+//                    for (int i = 0; i < m_phiSteps; i += 1)
+//                    {
+//                        typename Cloud::Ptr subcloud(new Cloud);
+//                        pcl::copyPointCloud(*cloud, m_columns[i], *subcloud);
+//                        v.updatePointCloud<PointType>(subcloud, "pts");
+//                        v.spin();
+//                    }
+//                    v.removeAllPointClouds();
+//                }
 
                 /*m_trees.clear();
                 m_trees.resize(m_phiSteps);
@@ -159,21 +159,39 @@ namespace hpe
 
                 std::vector<int> indices = GetIntersection(column, row);
 
-                if (m_visualize)
-                {
+//                if (m_visualize)
+//                {
 //                    typename Cloud::Ptr subcloud(new Cloud);
-//                    pcl::copyPointCloud(*treeCloud, indices, *subcloud);
+//                    pcl::copyPointCloud(*cloud, indices, *subcloud);
 //                    subcloud->push_back(point);
-//                    pcl::visualization::PCLVisualizer v("sub");
-//                    v.addPointCloud<PointType>(cloud);
-//                    v.addPointCloud<PointType>(subcloud, "1");
-//                    v.addPointCloud<PointType>(treeCloud, "2");
-//                    v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "1");
-//                    v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "1");
-//                    v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "2");
-//                    v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "2");
-//                    v.spin();
-                }
+//
+//                    if (!m_vis_initialized)
+//                    {
+//                        m_v.addPointCloud<PointType>(cloud);
+//                        m_v.addPointCloud<PointType>(subcloud, "1");
+//                        m_v.addPointCloud<PointType>(cloud, "2");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "1");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "1");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "2");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "2");
+//                        m_v.spin();
+//
+//                        m_vis_initialized = true;
+//                    }
+//                    else
+//                    {
+//                        m_v.removeAllPointClouds();
+//                        m_v.addPointCloud<PointType>(cloud);
+//                        m_v.addPointCloud<PointType>(subcloud, "1");
+//                        m_v.addPointCloud<PointType>(cloud, "2");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "1");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "1");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "2");
+//                        m_v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "2");
+//                        m_v.spin();
+//                    }
+//
+//                }
 
                 if (indices.size() > 0)
                 {
@@ -293,6 +311,10 @@ namespace hpe
             int m_ySteps;
 
             bool m_visualize;
+
+//            bool m_vis_initialized;
+//            pcl::visualization::PCLVisualizer m_v;
+
             cv::Mat m_result;
             cv::Size m_featureSize;
             int m_featureNumber;

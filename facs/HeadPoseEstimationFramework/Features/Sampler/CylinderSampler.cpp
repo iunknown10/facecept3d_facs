@@ -15,6 +15,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/vtk_io.h>
+#include <pcl/visualization/pcl_visualizer.h>
 
 using namespace boost::assign;
 
@@ -23,7 +24,7 @@ namespace hpe
     CylinderSampler::CylinderSampler(Range phiRange, Range zRange, int topRows, int bottomRows, int sampleColumns)
         : m_phiRange(phiRange), m_zRange(zRange), m_topRows(topRows),
           m_bottomRows(bottomRows), m_visualize(false), m_sampleColumns(sampleColumns),
-          m_supportOptimizedSampling(false)
+          m_supportOptimizedSampling(false)//, m_cyl_visualizer("Cylinder Visualizer"), m_first_vis(true)
     {
         //m_rightEyeIndices += 0, 4;
         //m_leftEyeIndices += 8, 12;
@@ -96,52 +97,62 @@ namespace hpe
             coefficients.values.push_back(totalRows);
         }
 
-        if (m_visualize)
-        {
-            std::cout << samplingCylinderTop->size() << std::endl;
-
-            pcl::PointCloud<pcl::PointXYZRGBA>::Ptr rgbCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
-            pcl::copyPointCloud(*cloud, *rgbCloud);
-
-            CloudType::Ptr eyes(new CloudType);
-            eyes->push_back(leftEye);
-            eyes->push_back(rightEye);
-
-            std::vector<float> eyeYs;
-            eyeYs.push_back(eyeY);
-            auto eyeLine = GenerateSamplingCloud(cylinder, direction, phiRange, m_sampleColumns, eyeYs);
-
-            std::vector<pcl::visualization::Camera> cameras;
-
-            pcl::visualization::PCLVisualizer vEyes("Eyes");
-            vEyes.addPointCloud(rgbCloud, "c");
-            vEyes.addPointCloud<PointType>(eyes, "e");
-            vEyes.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "e");
-            vEyes.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "e");
-            vEyes.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "c");
-            vEyes.setBackgroundColor(1, 1, 1);
-
-            vEyes.spin();
-
-            vEyes.getCameras(cameras);
-
-            pcl::visualization::PCLVisualizer v("");
-            v.addPointCloud(rgbCloud, "c");
-            v.addPointCloud<PointType>(samplingCylinderTop, "cyl");
-            v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "cyl");
-            v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 1, 1, "cyl2");
-
-            v.addCoordinateSystem();
-            v.addPointCloud<PointType>(eyeLine, "EyeLine");
-            v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "EyeLine");
-            v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "EyeLine");
-            v.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 4, "c");
-            v.setBackgroundColor(1, 1, 1);
-
-            v.setCameraParameters(cameras[0]);
-            v.spin();
-
-        }
+//        if (m_visualize)
+//        {
+////            std::cout << samplingCylinderTop->size() << std::endl;
+//
+//            pcl::PointCloud<pcl::PointXYZRGBA>::Ptr rgbCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+//            pcl::copyPointCloud(*cloud, *rgbCloud);
+//
+//            CloudType::Ptr eyes(new CloudType);
+//            eyes->push_back(leftEye);
+//            eyes->push_back(rightEye);
+//
+//            std::vector<float> eyeYs;
+//            eyeYs.push_back(eyeY);
+//            auto eyeLine = GenerateSamplingCloud(cylinder, direction, phiRange, m_sampleColumns, eyeYs);
+//
+////            std::vector<pcl::visualization::Camera> cameras;
+////
+////            pcl::visualization::PCLVisualizer vEyes("Eyes");
+////            vEyes.addPointCloud(rgbCloud, "c");
+////            vEyes.addPointCloud<PointType>(eyes, "e");
+////            vEyes.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "e");
+////            vEyes.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "e");
+////            vEyes.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "c");
+////            vEyes.setBackgroundColor(1, 1, 1);
+////
+////            vEyes.spin();
+////
+////            vEyes.getCameras(cameras);
+//
+//            if (m_first_vis)
+//            {
+//                m_first_vis = false;
+//
+//                m_cyl_visualizer.addPointCloud(rgbCloud, "c");
+//                m_cyl_visualizer.addPointCloud<PointType>(samplingCylinderTop, "cyl");
+//                m_cyl_visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "cyl");
+//                m_cyl_visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 1, 1, "cyl");
+//
+//                m_cyl_visualizer.addCoordinateSystem();
+//                m_cyl_visualizer.addPointCloud<PointType>(eyeLine, "EyeLine");
+//                m_cyl_visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "EyeLine");
+//                m_cyl_visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "EyeLine");
+//                m_cyl_visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 4, "c");
+//                m_cyl_visualizer.setBackgroundColor(0, 0, 0);
+//            }
+//            else
+//            {
+//                m_cyl_visualizer.removePointCloud("c");
+//                m_cyl_visualizer.addPointCloud(rgbCloud, "c");
+//                m_cyl_visualizer.updatePointCloud<PointType>(samplingCylinderTop, "cyl");
+//                m_cyl_visualizer.updatePointCloud<PointType>(eyeLine, "EyeLine");
+//            }
+//
+//            m_cyl_visualizer.spinOnce(1);
+//
+//        }
 
         return samplingCylinderTop;
     }

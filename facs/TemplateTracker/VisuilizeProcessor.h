@@ -32,6 +32,8 @@ class VisuilizeProcessor : public hpe::IProcessor
             m_loggingFlag = loggingFlag;
         }
 
+        long m_visCounter;
+
     private:
         pcl::visualization::PCLVisualizer m_visualizer;
         bool m_first;

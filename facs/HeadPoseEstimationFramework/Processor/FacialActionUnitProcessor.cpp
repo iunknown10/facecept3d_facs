@@ -56,12 +56,12 @@ namespace hpe
         SampleColumns=120
         */
         CylinderSampler::Range phiRange;
-        phiRange.first = 0.05;
-        phiRange.second = 0.95;
+        phiRange.first = 0.15;
+        phiRange.second = 0.85;
 
         CylinderSampler::Range zRange;
-        zRange.first = 0.9;
-        zRange.second = 1.3;
+        zRange.first = 1.3;
+        zRange.second = 1.5;
 
         int topRows = 45;
         int bottomRows = 105;
@@ -130,6 +130,7 @@ namespace hpe
         m_featureCalculator->SetFeatureSize(cv::Size(120, 150));
 
         boost::thread t(boost::bind(&FacialActionUnitProcessor::ThreadRoutine, this));
+        m_facsCounter = 0;
     }
 
     void FacialActionUnitProcessor::ThreadRoutine()
@@ -176,22 +177,18 @@ namespace hpe
             //unrolled.convertTo(unrolled, CV_64FC1);
 
             //cv::Mat frame = fer::RV_preprocessDepthFrame(unrolled);
-            cv::Mat frame;
-            cv::cvtColor(unrolled, frame, CV_BGR2GRAY);
+            cv::Mat frame, frameShow;
+            cv::cvtColor(unrolled, frameShow, CV_BGR2GRAY);
+            frameShow.convertTo(frame, CV_64FC1);
             //facs::RV_imshow("Unrolled_converted", frame);
-            cv::imshow("Unrolled", frame);
-            cv::waitKey(20);
-
-            /*cv::Mat bgr[3];
-            cv::split(unrolled, bgr);
-            fer::RV_writeCSVMat("test_R", bgr[2]);
-            fer::RV_writeCSVMat("test_G", bgr[1]);
-            fer::RV_writeCSVMat("test_B", bgr[0]);*/
+            cv::imshow("Unrolled", frameShow);
+            cv::waitKey(10);
 
             std::vector<cv::Mat> featData = facs::RV_lpqImage_facs(frame, m_LPQFilters, m_V, m_facsParameters);
 
             std::vector<std::vector<double> > pred(featData.size(), std::vector<double>(2));
-            std::vector<double> finalProbs(featData.size());
+            std::vector<double> finalProbs(featData.size()+ 1);
+            //m_facsResult.reserve(featData.size()+ 1);
 
             for(int i= 0; i< featData.size(); i++)
             {
@@ -200,9 +197,19 @@ namespace hpe
                 finalProbs[i] = pred[i][1];
             }
 
+            finalProbs[featData.size()] = m_facsCounter;
             m_facsResult = finalProbs;
+            finalProbs.clear();
             m_facsDataReady = true;
             m_facsWorkerBusy = false;
+
+            if (m_facsSaveImgFlag) {
+                std::stringstream imName;
+                imName << "./images/IMG_" << setfill('0') << setw(6) << (long) m_facsCounter << ".JPG";
+                cv::imwrite(imName.str(), frame);
+            }
+
+            m_facsCounter++;
         }
     }
 

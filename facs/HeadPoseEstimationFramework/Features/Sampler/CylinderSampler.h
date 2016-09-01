@@ -3,6 +3,7 @@
 #include <Features/Sampler/IPatchSampler.h>
 
 #include <pcl/ModelCoefficients.h>
+#include <pcl/visualization/pcl_visualizer.h>
 
 #ifndef CYLINDERSAMPLER_H
 #define CYLINDERSAMPLER_H
@@ -44,6 +45,9 @@ namespace hpe
             int m_topRows;
             int m_bottomRows;
             int m_sampleColumns;
+
+//            pcl::visualization::PCLVisualizer m_cyl_visualizer;
+//            bool m_first_vis;
     };
 }
 

@@ -29,6 +29,12 @@ namespace hpe
         {
             m_facialActionUnitReady.connect(slot);
         }
+
+        void setSavingFlag(bool flag)
+        {
+            m_facsSaveImgFlag = flag;
+        }
+
     private:
         typedef pcl::PointXYZRGBNormal PointT;
         typedef pcl::PointXYZRGBNormal NormalT;
@@ -50,6 +56,10 @@ namespace hpe
         std::vector<int> m_auList;
         std::vector<cv::Mat> m_LPQFilters;
         cv::Mat m_V;
+
+//        cv::Mat m_faceImage;
+        double m_facsCounter;
+        bool m_facsSaveImgFlag;
 
         FacialActionUnitReadySignal m_facialActionUnitReady;
     };

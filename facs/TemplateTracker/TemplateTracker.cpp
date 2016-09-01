@@ -52,13 +52,14 @@ int main()
 //    std::string cloudToShowKey = "Cloud";
     std::shared_ptr<VisuilizeProcessor> visualizer(new VisuilizeProcessor(cloudToShowKey));
     visualizer->SetTrackingProcessor(templateTracker);
-//    visualizer->SetLoggingFlag(true);
+    visualizer->SetLoggingFlag(true);
 
 //    std::shared_ptr<hpe::FacialExpressionProcessor> ferProcessor(new hpe::FacialExpressionProcessor(settings.GetString("FERData")));
 //    ferProcessor->SubscribeFacialExpressionReadySignal(boost::bind(&VisuilizeProcessor::HandleFER, visualizer.get(), _1));
 
     std::shared_ptr<hpe::FacialActionUnitProcessor> facsProcessor(new hpe::FacialActionUnitProcessor(settings.GetString("FACSData"), {1, 4, 6, 9, 12, 43}));
     facsProcessor->SubscribeFacialActionUnitReadySignal(boost::bind(&VisuilizeProcessor::HandleFACS, visualizer.get(), _1));
+    facsProcessor->setSavingFlag(false);
 
     std::shared_ptr<FunctorFilter<pcl::PointXYZRGBA>> functorFilter(new FunctorFilter<pcl::PointXYZRGBA>(
     [&settings](pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud)->pcl::PointCloud<pcl::PointXYZRGBA>::Ptr  {

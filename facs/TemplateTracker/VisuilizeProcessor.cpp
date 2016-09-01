@@ -3,6 +3,7 @@
 
 #include <DataObject/LandmarksObject.h>
 #include <DataObject/CloudXYZRGBA.h>
+#include <iomanip>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <chrono>
 //#include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -27,6 +28,7 @@ VisuilizeProcessor::VisuilizeProcessor(std::string cloudKey)
     InitActionUnitLabels();
     time_t now = time(0);
     m_logStartTime = std::chrono::high_resolution_clock::now();
+    m_visCounter = -1;
     //m_logST = localtime(&now);
 }
 
@@ -167,13 +169,10 @@ void VisuilizeProcessor::Process(hpe::IDataStorage::Ptr dataStorage)
             int y = 35;
             int delta = 16;
 
-            //auto recognizedActionUnits = std::max_element(m_ferData.begin(), m_ferData.end());
-            //int recognizedExpressionIndex = std::distance(m_ferData.begin(), recognizedExpression);
-
-            for (int i = 0; i < m_facsData.size(); i++)
+            for (int i = 0; i < m_facsData.size()- 1; i++)
             {
                 double colorScale = 2; //i == recognizedExpressionIndex ? 2 : 1;
-                std::string message = (boost::format("  %1%: %2%") % m_actionUnitLabels[m_facsData.size()- i- 1] % m_facsData[m_facsData.size()- i- 1]).str();
+                std::string message = (boost::format("  %1% %2%") % m_actionUnitLabels[m_facsData.size()- i- 2] % m_facsData[m_facsData.size()- i- 2]).str();
                 std::string textObjectLabel = (boost::format("facsText%1%") % i).str();
                 m_visualizer.removeShape(textObjectLabel);
                 m_visualizer.addText(message, x, y, 17, colorScale * 0.5, colorScale * 0.5, colorScale * 0.5, textObjectLabel);
@@ -193,25 +192,22 @@ void VisuilizeProcessor::Process(hpe::IDataStorage::Ptr dataStorage)
                 }
                 else
                 {
-//                    time_t tnow;
-//                    time(&tnow);
+                    long facsCounter = (long)m_facsData[m_facsData.size()- 1];
+                    if (facsCounter > m_visCounter) {
 
-                    /*timeval tnow;
-                    gettimeofday(&tnow, NULL);
-                    double tnow_usec = tnow.tv_sec* 1000+ tnow.tv_usec;
-                    double tlog_usec = (double)mktime(m_logST)* 1000;*/
+                        m_visCounter++;
+                        auto elapsed_time = std::chrono::high_resolution_clock::now();
 
-                    auto elapsed_time = std::chrono::high_resolution_clock::now();
-
-                    std::chrono::duration<double> diff = (elapsed_time- m_logStartTime);
-                    m_logFileStream << (boost::format("%.3f") % diff.count()) << ";FACS;" <<
-                            (boost::format("%.2f") % m_facsData[0]).str() << ";" <<
-                            (boost::format("%.2f") % m_facsData[1]).str() << ";" <<
-                            (boost::format("%.2f") % m_facsData[2]).str() << ";" <<
-                            (boost::format("%.2f") % m_facsData[3]).str() << ";" <<
-                            (boost::format("%.2f") % m_facsData[4]).str() << ";" <<
-                            (boost::format("%.2f") % m_facsData[5]).str() << ";" <<
-                            "IMG_000000.JPG" << endl;
+                        std::chrono::duration<double> diff = (elapsed_time - m_logStartTime);
+                        m_logFileStream << (boost::format("%.3f") % diff.count()) << ";FACS;" <<
+                                        (boost::format("%.2f") % m_facsData[0]).str() << ";" <<
+                                        (boost::format("%.2f") % m_facsData[1]).str() << ";" <<
+                                        (boost::format("%.2f") % m_facsData[2]).str() << ";" <<
+                                        (boost::format("%.2f") % m_facsData[3]).str() << ";" <<
+                                        (boost::format("%.2f") % m_facsData[4]).str() << ";" <<
+                                        (boost::format("%.2f") % m_facsData[5]).str() << ";" <<
+                                        "IMG_" << setfill('0') << setw(6) << facsCounter << ".JPG" << endl;
+                    }
                 }
             }
         }
@@ -314,12 +310,12 @@ void VisuilizeProcessor::InitExpressionLabels()
 void VisuilizeProcessor::InitActionUnitLabels()
 {
     m_actionUnitLabels.clear();
-    m_actionUnitLabels.push_back("AU1");
-    m_actionUnitLabels.push_back("AU4");
-    m_actionUnitLabels.push_back("AU6");
-    m_actionUnitLabels.push_back("AU9");
-    m_actionUnitLabels.push_back("AU12");
-    m_actionUnitLabels.push_back("AU43");
+    m_actionUnitLabels.push_back("Inner Brow Raiser (AU01): ");
+    m_actionUnitLabels.push_back("Brow lowerer      (AU04): ");
+    m_actionUnitLabels.push_back("Cheek Raiser      (AU06): ");
+    m_actionUnitLabels.push_back("Nose Wrinkler     (AU09): ");
+    m_actionUnitLabels.push_back("Lip Corner Puller (AU12): ");
+    m_actionUnitLabels.push_back("Eyes Closed       (AU43): ");
 }
 
 void VisuilizeProcessor::KeyboardEventCallback(const pcl::visualization::KeyboardEvent &event, void *sender)
