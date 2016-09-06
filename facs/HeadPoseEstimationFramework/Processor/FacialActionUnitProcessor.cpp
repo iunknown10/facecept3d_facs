@@ -8,8 +8,11 @@
 #include <DataObject/LandmarksObject.h>
 
 #include <Helpers/HpeHelpers.h>
+#include <boost/circular_buffer.hpp>
+
 
 using namespace cv;
+namespace fs = boost::filesystem;
 
 namespace hpe
 {
@@ -102,6 +105,7 @@ namespace hpe
         std::vector<facs::paramList_facs> params_aux(m_numberOfActionUnits);
         std::vector<std::vector<facs::randomTree_facs> > forest_aux(m_numberOfActionUnits);
 
+        m_facsBuffer.reserve(m_numberOfActionUnits);
 
         for(int i= 0; i< m_numberOfActionUnits; i++)
         {
@@ -111,6 +115,9 @@ namespace hpe
             facs::RV_readParamList_facs(paramsDir, &params_aux[i]);
             std::string treesDir = dataFolder+ "trees/au_"+ dirIdx.str()+ "/";
             forest_aux[i] = facs::RV_readAllTrees_facs(treesDir, params_aux[i]);
+
+            boost::circular_buffer<double> localBuffer(3);
+            m_facsBuffer.push_back(localBuffer);
         }
 
         m_facsParameters = params_aux;
@@ -194,22 +201,34 @@ namespace hpe
             {
                 std::vector<facs::randomTree_facs> trees = m_facsForests[i];
                 pred[i] = facs::RV_testForest_facs(featData[i], trees, m_facsParameters[i], 2);
-                finalProbs[i] = pred[i][1];
+                m_facsBuffer[i].push_back(pred[i][1]);
+                //finalProbs[i] = pred[i][1];
             }
 
-            finalProbs[featData.size()] = m_facsCounter;
-            m_facsResult = finalProbs;
-            finalProbs.clear();
-            m_facsDataReady = true;
-            m_facsWorkerBusy = false;
 
-            if (m_facsSaveImgFlag) {
-                std::stringstream imName;
-                imName << "./images/IMG_" << setfill('0') << setw(6) << (long) m_facsCounter << ".JPG";
-                cv::imwrite(imName.str(), frame);
+            if (m_facsBuffer[0].full())
+            {
+                for(int i= 0; i< featData.size(); i++)
+                {
+                    double accum = std::accumulate(m_facsBuffer[i].begin(), m_facsBuffer[i].end(), 0.0);
+                    finalProbs[i] = accum/m_facsBuffer[i].size();
+                }
+
+                finalProbs[featData.size()] = m_facsCounter;
+                m_facsResult = finalProbs;
+                finalProbs.clear();
+                m_facsDataReady = true;
+                m_facsWorkerBusy = false;
+
+                if (m_facsSaveImgFlag) {
+
+                    std::stringstream imName;
+                    imName << m_facsSaveImgLocalFolder << "/IMG_" << setfill('0') << setw(6) << (long) m_facsCounter << ".JPG";
+                    cv::imwrite(imName.str(), frame);
+                }
+
+                m_facsCounter++;
             }
-
-            m_facsCounter++;
         }
     }
 

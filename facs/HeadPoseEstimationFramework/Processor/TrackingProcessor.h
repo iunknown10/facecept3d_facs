@@ -39,7 +39,7 @@ namespace hpe
                 m_templateLandmarks = ResampleLandmarksByPosition<PointType>(landmarks, m_template);
             }
 
-            void SetSaveLandmakrs(bool value)
+            void SetSaveLandmarks(bool value)
             {
                 m_saveLandmarks = value;
             }

@@ -13,6 +13,7 @@
 #include <FacialAU/facsLocalFunctions.h>
 #include <pcl/point_types.h>
 #include <boost/signals2/signal.hpp>
+#include <boost/circular_buffer.hpp>
 
 namespace hpe
 {
@@ -30,9 +31,19 @@ namespace hpe
             m_facialActionUnitReady.connect(slot);
         }
 
-        void setSavingFlag(bool flag)
+        void SetSaveImageFlag(bool flag)
         {
             m_facsSaveImgFlag = flag;
+        }
+
+        void SetSaveImageRoot(std::string root)
+        {
+            m_facsSaveImgRoot = root;
+        }
+
+        void SetSaveImageLocalFolder(std::string localFolder)
+        {
+            m_facsSaveImgLocalFolder = localFolder;
         }
 
     private:
@@ -50,6 +61,7 @@ namespace hpe
         bool m_facsWorkerBusy;
         bool m_facsDataReady;
         std::vector<double> m_facsResult;
+        std::vector<boost::circular_buffer<double>> m_facsBuffer;
         Common<PointT>::Landmarks m_facsLandmarks;
         pcl::PointCloud<PointT> m_facsCloud;
         int m_numberOfActionUnits;
@@ -60,6 +72,8 @@ namespace hpe
 //        cv::Mat m_faceImage;
         double m_facsCounter;
         bool m_facsSaveImgFlag;
+        std::string m_facsSaveImgRoot;
+        std::string m_facsSaveImgLocalFolder;
 
         FacialActionUnitReadySignal m_facialActionUnitReady;
     };
