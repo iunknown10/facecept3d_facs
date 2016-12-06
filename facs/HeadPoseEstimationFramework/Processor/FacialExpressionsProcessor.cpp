@@ -26,7 +26,7 @@ namespace hpe
             CloudXYZRGBA::Ptr cloudObject = dataStorage->GetAndCast<CloudXYZRGBA>("OriginalCloud");
             if (cloudObject.get() == nullptr)
             {
-                cloudObject = dataStorage->GetAndCastNotNull<CloudXYZRGBA>("Cloud", "FacialExpressionProcessor::Process - cloud is null");
+                cloudObject = dataStorage->GetAndCastNotNull<CloudXYZRGBA>("FilteredOriginalCloud", "FacialExpressionProcessor::Process - cloud is null");
             }
             LandmarksObject<pcl::PointXYZRGBA>::Ptr landmarksObject = dataStorage->GetAndCastNotNull<LandmarksObject<pcl::PointXYZRGBA>>("Landmarks", "FacialExpressionProcessor::Process - landmarks are null");
 
@@ -56,12 +56,12 @@ namespace hpe
         SampleColumns=120
         */
         CylinderSampler::Range phiRange;
-        phiRange.first = 0.05;
-        phiRange.second = 0.95;
+        phiRange.first = 0.15;
+        phiRange.second = 0.85;
 
         CylinderSampler::Range zRange;
-        zRange.first = 0.9;
-        zRange.second = 1.3;
+        zRange.first = 1.3;
+        zRange.second = 1.5;
 
         int topRows = 45;
         int bottomRows = 105;

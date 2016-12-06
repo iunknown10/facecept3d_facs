@@ -41,7 +41,7 @@ int main()
     std::shared_ptr<UIProcessor> uiProcessor(new UIProcessor);
     uiProcessor->SetGrabber(&grabber);
 
-    std::shared_ptr<DepthPreprocessingProcessor> preprocessor(new DepthPreprocessingProcessor(1, 3, 7, 3, 1.5)); // erodeSize, closingSize, gaussianSize, gaussianSigma, distanceTh
+    std::shared_ptr<DepthPreprocessingProcessor> preprocessor(new DepthPreprocessingProcessor(1, 3, 9, 5, 1.1)); // erodeSize, closingSize, gaussianSize, gaussianSigma, distanceTh
 
 //    std::shared_ptr<DetectorProcessor> headposeDetector(new DetectorProcessor(settings.GetString("DetectorData")));
 
@@ -59,33 +59,33 @@ int main()
     visualizer->SetLoggingFlag_HP(settings.GetValue<bool>("LoggingFlag_HP"));
     visualizer->SetPlotCloudFlag(settings.GetValue<bool>("PlotCloudFlag"));
 
-//    std::shared_ptr<hpe::FacialExpressionProcessor> ferProcessor(new hpe::FacialExpressionProcessor(settings.GetString("FERData")));
-//    ferProcessor->SubscribeFacialExpressionReadySignal(boost::bind(&VisuilizeProcessor::HandleFER, visualizer.get(), _1));
+    std::shared_ptr<hpe::FacialExpressionProcessor> ferProcessor(new hpe::FacialExpressionProcessor(settings.GetString("FERData")));
+    ferProcessor->SubscribeFacialExpressionReadySignal(boost::bind(&VisuilizeProcessor::HandleFER, visualizer.get(), _1));
 
-    std::shared_ptr<hpe::FacialActionUnitProcessor> facsProcessor(new hpe::FacialActionUnitProcessor(settings.GetString("FACSData"), {1, 4, 6, 9, 12, 43}));
-    facsProcessor->SubscribeFacialActionUnitReadySignal(boost::bind(&VisuilizeProcessor::HandleFACS, visualizer.get(), _1));
-    bool saveImagesFlag = settings.GetValue<bool>("SaveFaceImageFlag");
-    if (saveImagesFlag) {
-        facsProcessor->SetSaveImageFlag(saveImagesFlag);
-
-        std::string imgRoot = settings.GetString("SaveFaceImageFolder");
-
-        facsProcessor->SetSaveImageRoot(imgRoot);
-
-        std::locale loc(std::cout.getloc(), new time_facet("%Y%m%d_%H%M%S"));
-        std::stringstream wss;
-        wss.imbue(loc);
-        ptime now = second_clock::local_time();
-        wss << imgRoot << now << "/";
-
-        const std::string localPath = wss.str();
-
-        if (fs::exists(localPath) == false) {
-            fs::create_directories(localPath);
-            cout << "Successfully created: " << localPath << endl;
-            facsProcessor->SetSaveImageLocalFolder(localPath);
-        }
-    }
+//    std::shared_ptr<hpe::FacialActionUnitProcessor> facsProcessor(new hpe::FacialActionUnitProcessor(settings.GetString("FACSData"), {1, 4, 6, 9, 12, 43}));
+//    facsProcessor->SubscribeFacialActionUnitReadySignal(boost::bind(&VisuilizeProcessor::HandleFACS, visualizer.get(), _1));
+//    bool saveImagesFlag = settings.GetValue<bool>("SaveFaceImageFlag");
+//    if (saveImagesFlag) {
+//        facsProcessor->SetSaveImageFlag(saveImagesFlag);
+//
+//        std::string imgRoot = settings.GetString("SaveFaceImageFolder");
+//
+//        facsProcessor->SetSaveImageRoot(imgRoot);
+//
+//        std::locale loc(std::cout.getloc(), new time_facet("%Y%m%d_%H%M%S"));
+//        std::stringstream wss;
+//        wss.imbue(loc);
+//        ptime now = second_clock::local_time();
+//        wss << imgRoot << now << "/";
+//
+//        const std::string localPath = wss.str();
+//
+//        if (fs::exists(localPath) == false) {
+//            fs::create_directories(localPath);
+//            cout << "Successfully created: " << localPath << endl;
+//            facsProcessor->SetSaveImageLocalFolder(localPath);
+//        }
+//    }
 
     std::shared_ptr<FunctorFilter<pcl::PointXYZRGBA>> functorFilter(new FunctorFilter<pcl::PointXYZRGBA>(
     [&settings](pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud)->pcl::PointCloud<pcl::PointXYZRGBA>::Ptr  {
@@ -107,12 +107,13 @@ int main()
     grabber.AddProcessor(filterProcessor); // filters the point cloud representation (in this case a parametrized (by "DistanceToShow") "PassThrough" filter is being used)
     // and returns the result in "FilteredOriginalCloud"
 
-    grabber.AddProcessor(IProcessor::Ptr(new VoxelizeProcessor(0.02))); // applies yet another filter to the "Cloud" and returns the result in "Cloud"
+    grabber.AddProcessor(IProcessor::Ptr(new VoxelizeProcessor(0.01))); // applies yet another filter to the "Cloud" and returns the result in "Cloud"
     //grabber.AddProcessor(headposeDetector);
 
 //    grabber.AddProcessor(headposeDetector);
     grabber.AddProcessor(templateTracker);
-    grabber.AddProcessor(facsProcessor);
+//    grabber.AddProcessor(facsProcessor);
+    grabber.AddProcessor(ferProcessor);
     grabber.AddProcessor(visualizer);
 
     grabber.Start();

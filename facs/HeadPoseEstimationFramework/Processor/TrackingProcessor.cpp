@@ -95,7 +95,7 @@ namespace hpe
                     std::string landmarksFile = boost::algorithm::replace_all_copy(f_out, ".pcd", ".bnd");
                     SaveLandmarks<pcl::PointXYZRGBA>(frameLandmarks, landmarksFile);
                 }*/
-                Eigen::Matrix4f transform = m_mapper.GetTransformHavingLandmarks(m_template, m_templateLandmarks, cloudObject->cloud, frameLandmarks);
+                Eigen::Matrix4f transform = m_mapper.GetTransformHavingLandmarks(m_template, m_templateLandmarks, cloudObject->cloud, m_templateLandmarks);
                 pcl::transformPointCloud(*m_template, *(updatedTemplateObject->cloud), transform);
                 m_tracker->RoughFirstTimeDetection(cloudObject->cloud, transform);
             }
